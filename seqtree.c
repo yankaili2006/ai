@@ -9,8 +9,9 @@ typedef struct Node
     struct Node *lc, *rc;
 }TNode;
 
-void printH(TNode *r)
+void printH(TNode *root)
 {
+    TNode *r = root;
     TNode *nl[9] = {NULL};
     int h=0, t=0;
     if (r == NULL)
@@ -41,37 +42,45 @@ void printL(TNode *root)
          printf("%d\t", root->d);
          root = root->rc;
     }
+    printf("\n");
+
     return;
 }
 
-void link(TNode *root, TNode *h, TNode *t)
+TNode* link(TNode *root, TNode **h, TNode **t)
 {
-    TNode *lt = NULL, *rh = NULL;
+    TNode *lt, *rh;
  
+    /* printf("root->d = [%d]\n", root->d); */
     if (root->lc == NULL)
-        t = root;
+        *h = root;
     else
     {
-       link(root->lc, h, lt);
+       link(root->lc, h, &lt);
+       /* printf("root->d = [%d], *h = [%p], *h->d = [%d], lt = [%p], lt->d = [%d]\n", root->d, *h, (*h)->d, lt, lt->d); */
        lt->rc = root;
+       root->lc = lt;
     }
 
     if (root->rc == NULL)
-        h = root;
+        *t = root;
     else
     {
-        link(root->rc, rh, t);
+        link(root->rc, &rh, t);
+        /* printf("root->d = [%d], rh = [%p], *t = [%p]\n", root->d, rh, *t); */
         root->rc = rh;
+        rh->lc = root;
     }
+    /* printf("root->d = [%d], *h->d = [%d], *t->d = [%d]\n", root->d, (*h)->d, (*t)->d); */
 
-    return;
+    return *h;
 }
 
 int
 main(int argc, char** argv)
 {
-    TNode *root, *p, *t, *h;
-    int data[9] = {0, 7, 10, 6, 14, 4, 8, 12, 16}; 
+    TNode *root, *p, *t, *h, *lh;
+    int data[9] = {0, 10, 6, 14, 4, 8, 12, 16, 1}; 
     TNode *nl[9] = {NULL};
     int i=0;
 
@@ -92,11 +101,10 @@ main(int argc, char** argv)
     }
     root = nl[1];
     
-    printf("[%d], [%d]\n", root->d, root->rc->d);
     printH(root);
 
-    link(root, h, t);
-    printL(root);
+    lh = link(root, &h, &t);
+    printL(lh);
 
     return 0;
 }
